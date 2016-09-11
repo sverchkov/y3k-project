@@ -8,8 +8,10 @@ ferm.p = read.delim( "raw-data/AvgKO_Ferm_P.txt" )
 # Molecule names should be char
 ferm.p$Molecule.Name = as.character( ferm.p$Molecule.Name )
 
-# Distinguish the two glyceric acid rows
-ferm.p = mutate( ferm.p, Molecule.Name = replace( Molecule.Name, Molecule.Name == "Glyceric acid", paste0( "Glyceric acid ", 1:2 ) ) )
+# Cleanup: Drop empty column and distinguish the two glyceric acid rows
+ferm.p = ferm.p %>%
+  select( -X ) %>%
+  mutate( Molecule.Name = replace( Molecule.Name, Molecule.Name == "Glyceric acid", paste0( "Glyceric acid ", 1:2 ) ) )
 
 # Save
 save( ferm.p, file = "clean-data/fermentation.RData" )
