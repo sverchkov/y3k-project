@@ -29,10 +29,30 @@ ferm.p.proteins = column_to_rownames( ferm.p.proteins, "Molecule.Name" )
 # Save to clean data
 save( ferm.p, ferm.p.proteins, file = "clean-data/ferm-for-nem.RData" )
 
+###
+###
+
 # Load respiratory data
-#resp.p = read.delim( "raw-data/AvgKO_Resp_P.txt" )
+resp.p = read.delim( "raw-data/AvgKO_Resp_P.txt" )
+
+# Molecule names should be char
+resp.p$Molecule.Name = as.character( resp.p$Molecule.Name )
 
 # Save to clean data
+save( resp.p, file = "clean-data/respiration.RData" )
+
+# Split out proteins
+resp.p.proteins = resp.p %>% filter( Molecule.Type == "Protein" ) %>% select( -(Molecule.Type) )
+
+# Drop type column in ferm.p
+resp.p = resp.p %>% select( -Molecule.Type )
+
+# Cols to names
+resp.p = column_to_rownames( resp.p, "Molecule.Name" )
+resp.p.proteins = column_to_rownames( resp.p.proteins, "Molecule.Name" )
+
+# Save to clean data
+save( resp.p, resp.p.proteins, file = "clean-data/resp-for-nem.RData" )
 
 # Load resp-RDR data
 
