@@ -8,7 +8,7 @@ D = getDensityMatrix( resp.p, dirname="tmp" )
 # getDensityMatrix forgets row names for some reason
 dimnames( D ) = dimnames( resp.p )
 
-save( D, file = "intermediates/ferm.RData" )
+save( D, file = "intermediates/resp.RData" )
 
 # NEM code can't handle infinities
 D[ D == -Inf ] = -.Machine$double.xmax

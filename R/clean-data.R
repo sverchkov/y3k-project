@@ -38,6 +38,9 @@ resp.p = read.delim( "raw-data/AvgKO_Resp_P.txt" )
 # Molecule names should be char
 resp.p$Molecule.Name = as.character( resp.p$Molecule.Name )
 
+# Cleanup: drop empty column
+resp.p = resp.p %>% select( -X )
+
 # Save to clean data
 save( resp.p, file = "clean-data/respiration.RData" )
 
