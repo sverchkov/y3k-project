@@ -1,0 +1,5 @@
+The "_KO" files contain fold changes in molecule abundance as compared to WT [Log2(triplicate averaged KO abundance) - Log2(triplicate averaged WT abundance)].
+The "_SD" files contain standard deviations of molecule abundance across triplicate KO measurements.
+The "_P" files contain p-values from a 2-sided student's t-test (triplicate KO measurements & triplicate WT measurements).
+
+The second 'glyceric acid' entry should correspond to a different derivative than the first entry but was not given a unique name. Feel free to change that identifier however you like for your purposes.  
