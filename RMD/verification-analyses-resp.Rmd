@@ -1,0 +1,48 @@
+---
+title: "Verification Analyses"
+author: "Yuriy Sverchkov"
+date: "3/30/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#knitr::opts_chunk$set(echo = TRUE)
+resp.fgnem = readRDS("../results/respiration-fgnem.rds")
+```
+
+In this document we take the FGNEM learned from the respiration data and verify it against findings from the Nature Biotechnology paper.
+
+## Identification of gene-specific phenotypes
+
+The Y3K data set was systematically surveyed for effects that are specific to just one or two strains in the study.
+These should correspond to effects that are attached to top 2 layers of the FGNEM
+
+```{r gene-specific phenotypes}
+#TODO. Look at Sup. Note 2, Sup. Tab. 4, Sup. Fig.s 5,6)
+```
+
+## Cliques in the FGNEM
+
+Cliques in the FGNEM can be seen as clusters of knockouts, and we compare them to the clustering of profiles in the paper.
+
+```{r respiration deficient strains}
+# (Fig. 3c–f, Supplementary Fig. 8, Supplementary Note 4, and Supplementary Table 5).
+# Supplementary Fig 9, Note 5, Supplementary table 6
+
+# Y3K Identified a CoQ biosynthesis genes cluster that incuded uncharacterized yjr120w
+# Also something about Atp2p
+```
+
+## Effect groups in the FGNEM
+
+Effect groups in the FGNEM can be seen as clusters of molecules, and we compare them to the clustering of molecules by covariance
+
+```{r effect groups}
+# Look at Coq4p, PPHB
+# Proteins in complexes (Cct2p, Cct7p)
+# (Fig. 4b, Supplementary Fig. 11a, and Supplementary Table 8).
+# These RDR-adjusted networks associated the MXP Yor020w-a with the mitochondrial ribosome (Supplementary Fig. 11g).
+# To test this association, we examined the proteome of 􀀤yor020w-a yeast, which showed a significant (P < 0.05) decrease in the mitochondrial ribosome protein Rsm19p (Supplementary Fig. 11i), suggesting that Yor020w-a is linked to mitochondrial translation.
+# (Fig. 4b, Supplementary Figs. 12 and 13). For example, the MXP Aim18p was linked to a network of CoQ biosynthesis proteins, and Aro9p and Aro10p were linked to numerous mitochondrial proteins that support oxidative phosphorylation (Fig. 4c–e).
+# Also see last paragraph on page 5 of main text
+```

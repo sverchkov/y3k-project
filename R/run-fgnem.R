@@ -16,7 +16,7 @@ expr = as.matrix( select( resp.data, -Molecule.Type, -Molecule.Name, -Standard.N
 rownames( expr ) = resp.data$Standard.Name
 
 # Limiter for experimentation
-expr = expr[,1:10]
+# expr = expr[,1:10]
 
 # Build object for input to FGNEM
 eg = list( egenes = expr
@@ -30,7 +30,7 @@ params = paramGen( 1.5 , 1 ) # Defaults, maybe worth changing
 # Run FGNEM
 results <- scoreBestModelEstimate( eg
                                  , params = params
-                                 , doTransitivity = TRUE
+                                 , doTransitivity = FALSE
                                  , summarization = max # or logsum
            )
 

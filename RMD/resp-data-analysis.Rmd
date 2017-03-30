@@ -1,0 +1,63 @@
+---
+title: "Analysis Respiration Data"
+author: "Yuriy Sverchkov"
+date: "2/7/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("graph")
+library("dplyr")
+load( "../results/resp.nem.RData" )
+```
+
+## Protein placements relative to knockdowns
+
+Are proteins attached directly to their respective knockout nodes?
+```{r direct attachments}
+# Sanity check
+# Check that a gene is under its own KD
+
+for( g in names( resp.nem$mappos ) ){
+  gn = sub( "X\\.", "", g )
+  if( !any( grep( gn, resp.nem$mappos[[g]] ) ) ){
+    print( paste0("no match in ", gn ) )
+  } else
+    print( paste0("match in ", gn ) )
+}
+```
+
+Are proteins attached downstream of their respective knockout nodes?
+```{r downstream attachments}
+source( "../R/matricesFromNem.R")
+effect.matrix = effectMatrixFromNEM( resp.nem )
+
+matches = rep( FALSE, nrow( effect.matrix ) )
+names( matches ) = rownames( effect.matrix )
+
+for( g in rownames( effect.matrix ) ){
+  gn = sub( "X.", "", g, fixed = TRUE )
+  if( !any( grep( gn, names( effect.matrix[g,] ) ) ) ){
+    print( paste0("no match in ", gn ) )
+  } else
+    matches[g] = TRUE
+    print( paste0("match in ", gn ) )
+}
+
+print( paste0( "Total matches: ", sum( matches ) ) )
+print( paste0( "Total mismatches: ", sum( !matches ) ) )
+```
+
+What are the KO effect sizes and p-values in the mismatches?
+```{r examine effect maismatches}
+# Load data tables
+resp.p = read.delim( "../raw-data/AvgKO_Resp_P.txt", stringsAsFactors = FALSE )
+resp.m = read.delim( "../raw-data/AvgKO_Resp_KO.txt", stringsAsFactors = FALSE )
+
+for( g in names( which( !matches ) ) ){
+  gn = sub( "X.", "", g, fixed = TRUE )
+  e = grep( gn, resp.m$Molecule.Name )
+  print( paste( g, resp.m$Molecule.Name[e], "m =", resp.m[e,g], "p =", resp.p[e,g] ) )
+}
+```
