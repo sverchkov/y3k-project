@@ -31,6 +31,34 @@ Cliques in the FGNEM can be seen as clusters of knockouts, and we compare them t
 
 # Y3K Identified a CoQ biosynthesis genes cluster that incuded uncharacterized yjr120w
 # Also something about Atp2p
+
+
+# Find cliques
+findCliques = function ( acc ){
+  
+  nodes = rownames( acc )
+  n = length( nodes )
+  duplicates = rep( 0, n )
+  names( duplicates ) = nodes
+  
+  for ( i in 1:(n-1) ) if ( duplicates[i] == 0 ) {
+    candidate = acc[,i]
+    for ( j in (i+1):n ){
+      alternate = acc[,j]
+      if ( all( alternate == candidate ) | all( alternate == -candidate ) )
+        duplicates[i] = duplicates[j] = i
+    }
+  }
+  
+  clique_inds = unique( duplicates[ duplicates != 0 ] )
+  
+  Map( function ( i ){ names( which( duplicates == i ) ) }, clique_inds )
+}
+
+cliques = findCliques( resp.fgnem$acc )
+
+"Cliques in the FGNEM:"
+cliques
 ```
 
 ## Effect groups in the FGNEM
