@@ -77,4 +77,34 @@ Effect groups in the FGNEM can be seen as clusters of molecules, and we compare 
 # To determine gene attachments, we look for the best nonzero attachment for every individual effect.
 # Each effect has 3 attachment probabilities under each action
 # Would the attachment then be = P( A->E ) * \prod_B!=A P( B//E ) ?
+# Then that = P( A->E ) / P( A//E ) * \prod_B P( B//E )
+# So we maximize the ratio, and if it is < 1, then the effect is attached nowhere.
+
+attachments = function ( logprobs ){
+  
+  actions = names( logprobs )
+  negatives = Reduce( cbind, Map( function ( table ) {
+    table[, "neg"] - table[, "null"] 
+  }, logprobs ) )
+  colnames( negatives ) = actions
+  
+  positives = Reduce( cbind, Map( function ( table ) {
+    table[, "pos"] - table[, "null"] 
+  }, logprobs ) )
+  colnames( positives ) = actions
+
+  attachment.types = apply(
+    cbind(
+      apply( negatives, 1, max, na.rm = TRUE ), # 1 = positive
+      apply( positives, 1, max, na.rm = TRUE ), # 2 = negative
+      0 ), # 3 = none
+    1, which.max )
+  
+  unlist( Map( function ( a.type, effect ){
+    if ( a.type < 3 ) names( which.max( switch( a.type, negatives[ effect, ], positives[ effect, ] ) ) )
+    else "null"
+  }, attachment.types, names( attachment.types ) ), use.names = TRUE )
+}
+
+attachments( resp.fgnem$egenes.logprobs )
 ```
