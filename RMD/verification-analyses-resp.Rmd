@@ -73,4 +73,8 @@ Effect groups in the FGNEM can be seen as clusters of molecules, and we compare 
 # To test this association, we examined the proteome of 􀀤yor020w-a yeast, which showed a significant (P < 0.05) decrease in the mitochondrial ribosome protein Rsm19p (Supplementary Fig. 11i), suggesting that Yor020w-a is linked to mitochondrial translation.
 # (Fig. 4b, Supplementary Figs. 12 and 13). For example, the MXP Aim18p was linked to a network of CoQ biosynthesis proteins, and Aro9p and Aro10p were linked to numerous mitochondrial proteins that support oxidative phosphorylation (Fig. 4c–e).
 # Also see last paragraph on page 5 of main text
+
+# To determine gene attachments, we look for the best nonzero attachment for every individual effect.
+# Each effect has 3 attachment probabilities under each action
+# Would the attachment then be = P( A->E ) * \prod_B!=A P( B//E ) ?
 ```
