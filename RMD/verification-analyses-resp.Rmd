@@ -106,5 +106,11 @@ attachments = function ( logprobs ){
   }, attachment.types, names( attachment.types ) ), use.names = TRUE )
 }
 
-attachments( resp.fgnem$egenes.logprobs )
+attachments.by.effect = attachments( resp.fgnem$egenes.logprobs )
+
+used.actions = unique( attachments.by.effect )
+used.actions = used.actions[ used.actions != "null" ]
+
+attachments.by.action = Map( function ( a ) names( which( attachments.by.effect == a ) ), used.actions )
+
 ```
