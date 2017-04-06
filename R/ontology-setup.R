@@ -34,7 +34,7 @@ parseOntology = function( file ){
         namespaces = sub("^namespace: ", "", lines[ idLines+2 ] ) )
 } 
 
-id.name.pairs = parseOntology( "raw-data/goslim_yeast.obo" )
+id.name.pairs = parseOntology( "raw-data/go-basic.obo" )
 
 go.term.names = data.frame( id = id.name.pairs$ids, name = id.name.pairs$names, space = id.name.pairs$namespaces, stringsAsFactors = FALSE )
 

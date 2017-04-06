@@ -133,3 +133,9 @@ go.attachment.enrichments = Map( function ( targets )
 saveRDS( go.attachment.enrichments, "../results/go-attachment-enrichments.rds" )
 ```
 
+# We also may want to look at attachments by clique
+```{r clique attachments}
+clique.attachments = Map( function ( clique ){
+  Reduce( c, Map( function ( ko ) attachments.by.action[[ko]], clique ) )
+} , cliques )
+```
