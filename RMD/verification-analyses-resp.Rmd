@@ -11,6 +11,10 @@ library("dplyr")
 source("../R/enrichments.R")
 associations = readRDS("../clean-data/associations.rds")
 resp.fgnem = readRDS("../results/respiration-fgnem.rds")
+
+fdr = 0.05
+
+nonempties = function ( list.of.dfs ) list.of.dfs[ Reduce( c, Map( nrow, list.of.dfs ) ) > 0 ]
 ```
 
 In this document we take the FGNEM learned from the respiration data and verify it against findings from the Nature Biotechnology paper.
@@ -68,8 +72,16 @@ Enrichments:
 ```{r enrichments for cliques}
 go.map = select( associations, standard.name, go.term )
 go.clique.enrichments = Map( function ( targets )
-  filterFDR( hyperGeometricEnrichmentRanking( targets, go.map ), 0.05 ), cliques )
+  hyperGeometricEnrichmentRanking( targets, go.map ), cliques )
 saveRDS( go.clique.enrichments, "../results/go-clique-enrichments.rds" )
+```
+
+Enrichments filtered at `r fdr` FDR w/ Benjamini-Hockberg correction
+```{r filtered cliques enrichments}
+filtered.go.clique.enrichments =
+  Map( function ( enrichments )
+    inner_join( enrichment, go.term.names, c( category = "id" ) ),
+    nonempties( Map( function(x) filterFDR( x, fdr ), go.clique.enrichments ) ) )
 ```
 
 ## Effect groups in the FGNEM
@@ -129,8 +141,16 @@ attachments.by.action = Map( function ( a ) names( which( attachments.by.effect 
 Enrichments:
 ```{r enrichments for attachments}
 go.attachment.enrichments = Map( function ( targets )
-  filterFDR( hyperGeometricEnrichmentRanking( targets, go.map ), 0.05 ), attachments.by.action )
+  hyperGeometricEnrichmentRanking( targets, go.map ), attachments.by.action )
 saveRDS( go.attachment.enrichments, "../results/go-attachment-enrichments.rds" )
+```
+
+Enrichments filtered at `r fdr` FDR w/ Benjamini-Hockberg correction
+```{r filtered attachments enrichments}
+filtered.go.attachment.enrichments =
+  Map( function ( enrichments )
+    inner_join( enrichments, go.term.names, c( category = "id" ) ),
+    nonempties( Map( function(x) filterFDR( x, fdr ), go.attachment.enrichments ) ) )
 ```
 
 # We also may want to look at attachments by clique
