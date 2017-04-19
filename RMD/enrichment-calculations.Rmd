@@ -1,0 +1,89 @@
+---
+title: "Enrichment Calculations"
+author: "Yuriy Sverchkov"
+date: "1/20/2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library("dplyr")
+source("../R/enrichments.R")
+source("../R/inferEffects.R")
+```
+
+Extract groups from NEM mixture
+```{r get groups}
+#nem.mixture = readRDS("results/single-ko-3-csnem.rds")
+#groups = Map( names, Map( which, inferEffects( nem.mixture )$effect.groups ) )
+groups = Map( names, Map( which, inferred$effect.groups ) )
+names( groups ) = paste0( "Group", 1:length(groups) )
+nonemptyGroups = 0 < Reduce( c, Map( length, groups ) )
+groups = groups[nonemptyGroups]
+```
+
+Get enrichments for groups.
+We have the group definitions:
+```{r get groups old}
+#group.defs = groups.df %>% filter( effect )
+
+#groups = strsplit( group.defs$transcript.list, " ", fixed = TRUE )
+#names( groups ) = group.defs$node
+#groups = groups[nonemptyGroups]
+```
+
+TF enrichments:
+```{r get tf enrichments}
+tf.enrichments = Map( function ( targets )
+  hyperGeometricEnrichmentRanking( targets, tf.clusters ), groups )
+```
+
+```{r add group names}
+for ( n in names( tf.enrichments ) ) tf.enrichments[[ n ]] = tf.enrichments[[ n ]] %>% mutate( group = n )
+```
+
+```{r summary table}
+tf.enrichment.table = Reduce( rbind, tf.enrichments ) %>% select( group, category, pVal )
+```
+
+```{r add target lists}
+tf.enrichment.table = tf.enrichment.table %>%
+  filter( pVal < 1e-4 ) %>%
+  rowwise() %>%
+  mutate( transcripts = paste0( "", Reduce( paste, getCategoryHits( category, groups[[group]], tf.clusters )$hits ) ) )
+```
+
+```{r write summary table}
+write.table( tf.enrichment.table, file = "../results/single-3-tf-filtered-enrichments.tsv", sep = "\t", quote = FALSE, row.names = FALSE )
+```
+
+GO enrichments:
+```{r build go map}
+# Limit go term enrichments only to those that are functional
+go.map = associations %>%
+  select( systematic.name, go.term ) %>%
+  inner_join( go.term.names %>% filter( space %in% c( "biological_process", "molecular_function") ),
+              by = c( go.term = "id" ) ) %>%
+  distinct( systematic.name, go.term, .keep_all = TRUE )
+```
+
+```{r get go enrichments}
+go.enrichments = Map(
+  function ( targets )
+    hyperGeometricEnrichmentRanking( targets, go.map ) %>%
+    filter( pVal < 1e-4 ) %>% #filterFDR(0.01) %>%
+    inner_join( go.term.names, by = c( category = "id" ) ) %>%
+    rowwise() %>%
+    mutate( transcripts = paste0( "", Reduce( paste, getCategoryHits( category, targets, go.map )$hits ) ) )
+  , groups )
+```
+
+```{r go summary table}
+for ( n in names( go.enrichments ) ) go.enrichments[[ n ]] = go.enrichments[[ n ]] %>% mutate( group = n )
+
+go.enrichment.table = Reduce( rbind, go.enrichments ) %>% select( group, category, name, pVal, transcripts )
+```
+
+```{r write summary table}
+write.table( go.enrichment.table, file = "../results/single-3-go-filtered-enrichments.tsv", sep = "\t", quote = FALSE, row.names = FALSE )
+```

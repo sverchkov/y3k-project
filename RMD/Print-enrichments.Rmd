@@ -1,0 +1,29 @@
+---
+title: "Enrichments from network"
+author: "Yuriy Sverchkov"
+date: "4/18/2017"
+output: pdf_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library("dplyr")
+library("knitr")
+
+go.attachment.enrichments = readRDS("../results/go-attachment-enrichments.rds")
+go.clique.enrichments = readRDS("../results/go-clique-enrichments.rds")
+go.term.names = readRDS("../clean-data/go-term-names.rds")
+```
+
+GO-term enrichments for attachment groups:
+```{r go attachment enrichments}
+for ( table in go.attachment.enrichments )
+  if ( nrow( table ) > 0 ) print( kable( left_join( table, go.term.names, by = c( category = "id" ) ) ) )
+```
+
+Go-term enrichments for cliques:
+```{r go clique enrichments}
+for ( table in go.clique.enrichments )
+  if ( nrow( table ) > 0 ) print( kable( left_join( table, go.term.names, by = c( category = "id" ) ) ) )
+```
