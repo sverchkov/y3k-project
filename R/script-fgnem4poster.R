@@ -55,8 +55,20 @@ clique.attachment.groups <- clique.attachment.proteins %>% group_by( action.cliq
 ## Make dataframe for sif
 ##
 # First, we get a mapping of cliques names to IDs
-action.mapping.df <- data.frame( set = rownames( clique.graph ), id = paste0( 'A', 1:nrow( clique.graph ) ), stringsAsFactors = FALSE )
-effect.mapping.df <- clique.attachment.groups %>% distinct( effect.group ) %>% mutate( id = paste0( 'E', 1:length( effect.group ) ) )
+action.mapping.df <-
+  data.frame(
+    set = rownames( clique.graph ),
+    id = paste0( 'A', 1:nrow( clique.graph ) ),
+    type = 'action',
+    label = rownames( clique.graph ),
+    stringsAsFactors = FALSE )
+effect.mapping.df <- clique.attachment.groups %>%
+  distinct( effect.group ) %>%
+  mutate( id = paste0( 'E', 1:length( effect.group ) ),
+          type = 'effect',
+          n.elements = Reduce( c, Map( length, strsplit( effect.group, ";" ) ) ),
+          label = ifelse( n.elements > 10, n.elements, effect.group ) ) %>%
+  select( -n.elements )
 all.mapping.df <- rbind.data.frame( action.mapping.df, effect.mapping.df %>% rename( set = effect.group ) )
 
 for.sif.df <- rbind(
@@ -81,7 +93,7 @@ gamma = 0.9
 gs <- gs2edge( character(), n.upp = 50, idtype = "ENSEMBL", lib = "org.Sc.sgd" )
 I <- gs$I
 
-for ( i in 2:length(effect.groups) ){
+for ( i in 3:length(effect.groups) ){
   gene.group <- effect.groups[[i]]
   
   y <- gs$y
@@ -94,9 +106,11 @@ for ( i in 2:length(effect.groups) ){
   if( !is.null( res ) ){
     saveRDS( res, file = paste0( "results/go-plots/result-",i,".rds" ) )
     
-    pdf( paste0( "results/go-plots/effects-",i,".pdf" ), width=15, height=5)
-    rmPlot( I, y, res$onwholes )
-    dev.off()
+    if ( length( res$onwholes ) > 1 ){
+      pdf( paste0( "results/go-plots/effects-",i,".pdf" ), width=15, height=5)
+      rmPlot( I, y, res$onwholes )
+      dev.off()
+    }
   }
 }
 
